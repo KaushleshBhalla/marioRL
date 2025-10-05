@@ -1,0 +1,6 @@
+# mario_rl
+mario reinforcement learning, automating mario game
+
+Mario user play file is not working probably due to version difference...
+as nes might not be compatible.... so sadly we cant play the game only our agent will......
+

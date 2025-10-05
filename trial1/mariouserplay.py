@@ -5,28 +5,27 @@ from nes_py.wrappers import JoypadSpace
 import pygame
 import sys
 
-# Set up environment with latest version v3 for Gymnasium compatibility
-env = gym_super_mario_bros.make('SuperMarioBros-v3', render_mode='human')
+# Create environment with Gymnasium
+env = gym_super_mario_bros.make('SuperMarioBros-v0', render_mode="human", apply_api_compatibility=True)
 env = JoypadSpace(env, SIMPLE_MOVEMENT)
 
-# Initialize pygame just for capturing keyboard input
+# Initialize pygame for keyboard input
 pygame.init()
 screen = pygame.display.set_mode((400, 300))
 pygame.display.set_caption("Super Mario - Keyboard Control")
 
-# Mapping of key presses to actions in SIMPLE_MOVEMENT
+# Map keys to actions
 KEY_TO_ACTION = {
-    pygame.K_0: 0,  # NOOP
-    pygame.K_RIGHT: 1,  # right
-    pygame.K_LEFT: 2,   # left
-    pygame.K_z: 3,      # jump right
-    pygame.K_x: 4,      # jump left
-    pygame.K_UP: 5,     # jump
-    pygame.K_DOWN: 6,   # duck
+    pygame.K_0: 0,      # NOOP
+    pygame.K_RIGHT: 1,  # Move right
+    pygame.K_LEFT: 2,   # Move left
+    pygame.K_z: 3,      # Jump right
+    pygame.K_x: 4,      # Jump left
+    pygame.K_UP: 5,     # Jump
+    pygame.K_DOWN: 6,   # Duck
 }
 
-# Reset environment
-state, info = env.reset()
+obs, info = env.reset()
 clock = pygame.time.Clock()
 
 print("Controls:")
@@ -40,16 +39,13 @@ print("ESC to quit")
 
 running = True
 while running:
-    action = 0  # default to NOOP
+    action = 0  # Default NOOP
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-            break
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                running = False
-                break
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            running = False
 
     keys = pygame.key.get_pressed()
     for key, mapped_action in KEY_TO_ACTION.items():
@@ -57,15 +53,14 @@ while running:
             action = mapped_action
             break
 
-    state, reward, done, truncated, info = env.step(action)
-    # The env automatically renders because of render_mode='human'
+    obs, reward, terminated, truncated, info = env.step(action)
+    done = terminated or truncated
 
     clock.tick(60)
 
-    if done or truncated:
-        state, info = env.reset()
+    if done:
+        obs, info = env.reset()
 
-# Cleanup
 env.close()
 pygame.quit()
 sys.exit()
